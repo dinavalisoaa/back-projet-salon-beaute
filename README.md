@@ -1,3 +1,5 @@
-# Crud Demo 
+# Master 1 Projet
+# Beauty salon management
 
-This is the source code for ["Building a CRUD app with Node, Express, and MongoDB"](https://zellwk.com/blog/crud-express-mongodb). 
+## Using MEAN Stack
+# By Dina Nancia
