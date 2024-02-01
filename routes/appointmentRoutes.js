@@ -7,4 +7,5 @@ router.post('/appointment', appointmentController.createAppointment);
 router.get('/appointment/:id', appointmentController.getAppointment);
 router.put('/appointment/:id', appointmentController.updateAppointment);
 router.delete('/appointment/:id', appointmentController.deleteAppointment);
+router.delete('/appointment/:id/pay', appointmentController.payAppointment);
 module.exports = router;
