@@ -12,7 +12,7 @@ exports.createCustomer = async (req, res) => {
         const savedCustomer = await newCustomer.save();
         res.status(201).json(savedCustomer);
     } catch (error) {
-        res.status(500).json({ error: 'An error occurred while creating the song' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -22,8 +22,7 @@ exports.getAllCustomer = async (req, res) => {
         const customer = await Customer.find().populate('sex').exec();
         res.json(customer);
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'An error occurred while fetching customer' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -43,8 +42,7 @@ exports.authentication = async (req, res) => {
             throw new Error("Compte introuvable");
         }
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'An error occurred while fetching customer' });
+        res.status(500).json({ error: error.message });
     }
 };
 
