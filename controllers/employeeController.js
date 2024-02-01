@@ -1,39 +1,38 @@
-const Service = require('../models/service');
+const Employee = require('../models/employee');
 
 // Create a new song
-exports.createService = async (req, res) => {
+exports.createEmployee = async (req, res) => {
  const {  name,
   price,
   duration,
   commission} = req.body;
  try {
-   const song = new Service({ name,price,duration,
+   const song = new Employee({ name,price,duration,
     commission});
-   const savedService = await song.save();
-   res.status(201).json(savedService);
+   const savedEmployee = await song.save();
+   res.status(201).json(savedEmployee);
  } catch (error) {
    res.status(500).json({ error: 'An error occurred while creating the song' });
  }
 };
 
 // Get all songs
-exports.getAllService = async (req, res) => {
+exports.getAllEmployee = async (req, res) => {
  try {
-   const song = await Service.find();
-   res.json(song
-   );
+   const song = await Employee.find();
+   res.json(song);
  } catch (error) {
    res.status(500).json({ error: 'An error occurred while fetching song' });
  }
 };
 
 // Get a specific song by ID
-exports.getService = async (req, res) => {
+exports.getEmployee = async (req, res) => {
  const serviceId = req.params.id;
  try {
-   const song = await Service.findById(serviceId);
+   const song = await Employee.findById(serviceId);
      if (!song) {
-       return res.status(404).json({ error: 'Service not found' });
+       return res.status(404).json({ error: 'Employee not found' });
        }
        res.json(song);
  } catch (error) {
@@ -42,36 +41,36 @@ exports.getService = async (req, res) => {
 };
 
 // Update a song by ID
-exports.updateService = async (req, res) => {
+exports.updateEmployee = async (req, res) => {
  const serviceId = req.params.id;
- const { name, price,
+ const {  price,
   duration,
   commission } = req.body;
  try {
-   const updatedService = await Service.findByIdAndUpdate(
+   const updatedEmployee = await Employee.findByIdAndUpdate(
     
-   serviceId,{   price,name,
+   serviceId,{   price,
     duration,
     commission },{ new: true });
-   if (!updatedService) {
-       return res.status(404).json({ error: 'Service not found' });
+   if (!updatedEmployee) {
+       return res.status(404).json({ error: 'Employee not found' });
    }
-   res.json(updatedService);
+   res.json(updatedEmployee);
  } catch (error) {
    res.status(500).json({ error: 'An error occurred while updating the song' });
  }
 };
 
 // Delete a song by ID
-exports.deleteService = async (req, res) => {
+exports.deleteEmployee = async (req, res) => {
  const serviceId = req.params.id;
  console.log(serviceId);
  try {
-   const deletedService = await Service.findByIdAndDelete(serviceId);
-   if (!deletedService) {
- return res.status(404).json({ error: 'Service not found' });
+   const deletedEmployee = await Employee.findByIdAndDelete(serviceId);
+   if (!deletedEmployee) {
+ return res.status(404).json({ error: 'Employee not found' });
  }
-   res.json(deletedService);
+   res.json(deletedEmployee);
  } catch (error) {
     console.log(error);
    res.status(500).json({ error: 'An error occurred while deleting the song' });

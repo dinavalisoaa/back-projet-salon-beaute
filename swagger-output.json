@@ -164,6 +164,76 @@
         }
       }
     },
+    "/api/customers": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/customer": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/customer/connection": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/service": {
       "get": {
         "description": "",
@@ -185,10 +255,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "title": {
+                "name": {
                   "example": "any"
                 },
-                "description": {
+                "price": {
+                  "example": "any"
+                },
+                "duration": {
+                  "example": "any"
+                },
+                "commission": {
                   "example": "any"
                 }
               }
@@ -243,10 +319,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "title": {
+                "name": {
                   "example": "any"
                 },
-                "description": {
+                "price": {
+                  "example": "any"
+                },
+                "duration": {
+                  "example": "any"
+                },
+                "commission": {
                   "example": "any"
                 }
               }
@@ -264,7 +346,9 @@
             "description": "Internal Server Error"
           }
         }
-      },
+      }
+    },
+    "/api/servsice/{id}": {
       "delete": {
         "description": "",
         "parameters": [
