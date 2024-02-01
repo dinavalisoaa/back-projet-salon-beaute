@@ -1,6 +1,7 @@
 const Customer = require('../models/customer');
 const Utils = require('../utils')
 const Sex = require('../models/sex');
+// const { sendScheduledEmail } = require('./emailController');
 
 // Create a new customer
 exports.createCustomer = async (req, res) => {
@@ -20,6 +21,14 @@ exports.createCustomer = async (req, res) => {
 exports.getAllCustomer = async (req, res) => {
     try {
         const customer = await Customer.find().populate('sex').exec();
+
+        // const date = new Date(2024,1,1,14,10);
+        // const recipient = 'lalaina.nancia64@gmail.com';
+        // const subject = 'Test email programme';
+        // const message = 'Test email programme sur express.js';
+
+        // await sendScheduledEmail({ body: { date, recipient, subject, message } }, null);
+
         res.json(customer);
     } catch (error) {
         res.status(500).json({ error: error.message });
