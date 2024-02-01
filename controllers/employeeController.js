@@ -95,3 +95,32 @@ exports.deleteEmployee = async (req, res) => {
    res.status(500).json({ error: 'An error occurred while deleting the employee' });
  }
 };
+
+//Activate account
+exports.activateAccount = async (req, res) => {
+  const employeeId = req.params.id;
+  const employee = req.body;
+  try {
+    const updatedEmployee = await Employee.updateOne({ _id: employeeId }, { $set: { status: 1 } });
+    if (!updatedEmployee) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+    res.json(updatedEmployee);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while updating the employee' });
+  }
+};
+
+//Deactivate account
+exports.deactivateAccount = async (req, res) => {
+  const employeeId = req.params.id;
+  try {
+    const updatedEmployee = await Employee.updateOne({ _id: employeeId }, { $set: { status: 0 } });
+    if (!updatedEmployee) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+    res.json(updatedEmployee);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while updating the employee' });
+  }
+};

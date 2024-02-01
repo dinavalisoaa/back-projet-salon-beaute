@@ -5,8 +5,7 @@ const employeeController = require('../controllers/employeeController');
 router.get('/employees', employeeController.getAllEmployee);
 router.get('/employees/active', employeeController.getActiveEmployee);
 router.post('/employee', employeeController.registration);
-// router.get('/songs/:id', songController.getSong);
-// router.put('/songs/:id', songController.updateSong);
-// router.delete('/songs/:id', songController.deleteSong);
+router.put('/employee/:id/activate', employeeController.activateAccount);
+router.put('/employee/:id/deactivate', employeeController.deactivateAccount);
 
 module.exports = router;
