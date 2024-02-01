@@ -46,5 +46,28 @@ exports.authentication = async (req, res) => {
     }
 };
 
+//Registration (signUp)
+exports.registration = async (req, res) => {
+    const customer = req.body;
+    try {
+        if(customer.name == null || customer.firstname == null || customer.dateOfBirth == null || customer.sex == null || customer.phoneNumber == null || customer.email == null || customer.password == null || customer.confirmationPassword == null){
+            throw new Error("Veuillez remplir les champs obligatoires");
+        }
+        if(customer.password != customer.confirmationPassword){
+            throw new Error("Mot de passe de confirmation invalide");
+        }
+        if(!Utils.isValidEmail(customer.email)){
+            throw new Error("Adresse email invalide");
+        }
+        const newCustomer = new Customer(customer);
+        newCustomer.password = Utils.encryptPassword(customer.password);
+        newCustomer.profile = null;
+        const savedCustomer = await newCustomer.save();
+        res.status(201).json(savedCustomer);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 
