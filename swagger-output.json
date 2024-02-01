@@ -237,6 +237,28 @@
     "/api/service": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "duration",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "commission",
+            "in": "query",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -265,6 +287,9 @@
                   "example": "any"
                 },
                 "commission": {
+                  "example": "any"
+                },
+                "illustration": {
                   "example": "any"
                 }
               }
@@ -330,6 +355,9 @@
                 },
                 "commission": {
                   "example": "any"
+                },
+                "illustration": {
+                  "example": "any"
                 }
               }
             }
@@ -346,9 +374,7 @@
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/api/servsice/{id}": {
+      },
       "delete": {
         "description": "",
         "parameters": [

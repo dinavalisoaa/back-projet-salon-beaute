@@ -1,79 +1,102 @@
-const Service = require('../models/service');
+const Service = require("../models/service");
 
 // Create a new song
 exports.createService = async (req, res) => {
- const {  name,
-  price,
-  duration,
-  commission} = req.body;
- try {
-   const song = new Service({ name,price,duration,
-    commission});
-   const savedService = await song.save();
-   res.status(201).json(savedService);
- } catch (error) {
-   res.status(500).json({ error: 'An error occurred while creating the song' });
- }
+  const { name, price, duration, commission, illustration } = req.body;
+  try {
+    const song = new Service({
+      name,
+      price,
+      duration,
+      commission,
+      illustration,
+    });
+    const savedService = await song.save();
+    res.status(201).json(savedService);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the song" });
+  }
 };
 
 // Get all songs
 exports.getAllService = async (req, res) => {
- try {
-   const song = await Service.find();
-   res.json(song
-   );
- } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching song' });
- }
+  try {
+    var json_filter = {};
+    if (req.query.name) {
+      json_filter.name = {
+        $regex: ".*" + req.query.name + ".*",
+      };
+    }
+    if (req.query.price) {
+      json_filter.price = req.query.price;
+    }
+    if (req.query.duration) {
+      json_filter.duration = req.query.duration;
+    }
+    if (req.query.commission) {
+      json_filter.commission = req.query.commission;
+    }
+
+    const song = await Service.find(json_filter);
+    res.json(song);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while fetching song" });
+  }
 };
 
 // Get a specific song by ID
 exports.getService = async (req, res) => {
- const serviceId = req.params.id;
- try {
-   const song = await Service.findById(serviceId);
-     if (!song) {
-       return res.status(404).json({ error: 'Service not found' });
-       }
-       res.json(song);
- } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching the song' });
- }
+  const serviceId = req.params.id;
+  try {
+    const song = await Service.findById(serviceId);
+    if (!song) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+    res.json(song);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the song" });
+  }
 };
 
 // Update a song by ID
 exports.updateService = async (req, res) => {
- const serviceId = req.params.id;
- const { name, price,
-  duration,
-  commission } = req.body;
- try {
-   const updatedService = await Service.findByIdAndUpdate(
-    
-   serviceId,{   price,name,
-    duration,
-    commission },{ new: true });
-   if (!updatedService) {
-       return res.status(404).json({ error: 'Service not found' });
-   }
-   res.json(updatedService);
- } catch (error) {
-   res.status(500).json({ error: 'An error occurred while updating the song' });
- }
+  const serviceId = req.params.id;
+  const { name, price, duration, commission, illustration } = req.body;
+  try {
+    const updatedService = await Service.findByIdAndUpdate(
+      serviceId,
+      { price, name, illustration, duration, commission },
+      { new: true }
+    );
+    if (!updatedService) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+    res.json(updatedService);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the song" });
+  }
 };
 
 // Delete a song by ID
 exports.deleteService = async (req, res) => {
- const serviceId = req.params.id;
- console.log(serviceId);
- try {
-   const deletedService = await Service.findByIdAndDelete(serviceId);
-   if (!deletedService) {
- return res.status(404).json({ error: 'Service not found' });
- }
-   res.json(deletedService);
- } catch (error) {
+  const serviceId = req.params.id;
+  console.log(serviceId);
+  try {
+    const deletedService = await Service.findByIdAndDelete(serviceId);
+    if (!deletedService) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+    res.json(deletedService);
+  } catch (error) {
     console.log(error);
-   res.status(500).json({ error: 'An error occurred while deleting the song' });
- }
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the song" });
+  }
 };
