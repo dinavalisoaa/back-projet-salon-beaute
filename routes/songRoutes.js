@@ -9,10 +9,5 @@ router.put('/songs/:id', songController.updateSong);
 router.delete('/songs/:id', songController.deleteSong);
 
 
-router.get('/service', songController.getAllSong);
-router.post('/service', songController.createSong);
-router.get('/service/:id', songController.getSong);
-router.put('/service/:id', songController.updateSong);
-router.delete('/service/:id', songController.deleteSong);
 
 module.exports = router;
