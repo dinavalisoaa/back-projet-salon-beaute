@@ -6,6 +6,7 @@ const swaggerFile = require('./swagger-output.json')
 const songRoutes = require('./routes/songRoutes');
 const customRoutes = require('./routes/customerRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
+const managerRoutes = require('./routes/managerRoutes');
 const cors = require('cors'); 
 const app = express();
 const port = process.env.PORT || 5050;
@@ -24,9 +25,18 @@ app.use(express.urlencoded({limit: '50mb'}));
 app.use('/api', songRoutes);
 app.use('/api', customRoutes);
 app.use('/api', serviceRoutes);
-
+app.use('/api', managerRoutes);
   
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerFile))
+
+// Middleware pour intercepter les erreurs
+app.use((err, req, res, next) => {
+    if (err.message) {
+        res.status(500).json({ error: err.message });
+    } else {
+        next(err);
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

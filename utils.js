@@ -6,6 +6,12 @@ function encryptPassword(password) {
     return sha256.digest('hex');
 }
 
+function isValidEmail(email) {
+    const emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+    return emailRegex.test(email);
+}
+
 module.exports = {
-    encryptPassword
+    encryptPassword,
+    isValidEmail
 };
