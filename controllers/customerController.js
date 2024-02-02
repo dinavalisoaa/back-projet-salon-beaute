@@ -5,12 +5,15 @@ const Sex = require('../models/sex');
 
 // Create a new customer
 exports.createCustomer = async (req, res) => {
-    const customer = req.body;
+    const {} = req.body;
+    const {  name,password } = req.body;
     try {
-        const newCustomer = new Customer(customer);
-        newCustomer.password = Utils.encryptPassword(customer.password);
-        newCustomer.profile = null;
-        const savedCustomer = await newCustomer.save();
+        const appointment = new Customer({
+            name,password 
+          });
+      
+          appointment.password = Utils.encryptPassword(customer.password);
+        const savedCustomer = await appointment.save();
         res.status(201).json(savedCustomer);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -50,6 +53,11 @@ exports.authentication = async (req, res) => {
         else{
             throw new Error("Compte introuvable");
         }
+        const token = jwt.sign({ userId: customer._id }, 'your-secret-key', {
+            expiresIn: '1h',
+            });
+            console.log(token);
+            res.status(200).json({token});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
