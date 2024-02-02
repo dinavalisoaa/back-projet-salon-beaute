@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const swaggerFile = require('./swagger-output.json')
 
@@ -7,6 +8,11 @@ const songRoutes = require('./routes/songRoutes');
 const customRoutes = require('./routes/customerRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const managerRoutes = require('./routes/managerRoutes');
+const expenseRoutes = require('./routes/expenseRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+
+const emailRoutes = require('./routes/emailRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
 const cors = require('cors'); 
 const app = express();
 const port = process.env.PORT || 5050;
@@ -26,6 +32,10 @@ app.use('/api', songRoutes);
 app.use('/api', customRoutes);
 app.use('/api', serviceRoutes);
 app.use('/api', managerRoutes);
+app.use('/api', expenseRoutes);
+app.use('/api', appointmentRoutes);
+app.use('/api', emailRoutes);
+app.use('/api', employeeRoutes);
   
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerFile))
 
