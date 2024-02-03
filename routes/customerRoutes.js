@@ -6,6 +6,7 @@ router.get('/customers', customerController.getAllCustomer);
 router.post('/customer', customerController.createCustomer);
 router.post('/customer/connection', customerController.authentication);
 router.post('/customer/registration', customerController.registration);
+router.post('/current-user', customerController.getUserConnected);
 // router.get('/songs/:id', songController.getSong);
 // router.put('/songs/:id', songController.updateSong);
 // router.delete('/songs/:id', songController.deleteSong);

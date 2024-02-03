@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
-
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
