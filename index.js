@@ -6,6 +6,7 @@ const swaggerFile = require("./swagger-output.json");
 
 const songRoutes = require("./routes/songRoutes");
 const customRoutes = require("./routes/customerRoutes");
+const accountRoutes = require("./routes/accountRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const managerRoutes = require("./routes/managerRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
@@ -35,6 +36,7 @@ app.use("/api", managerRoutes);
 app.use("/api", expenseRoutes);
 app.use("/api", appointmentRoutes);
 app.use("/api", emailRoutes);
+app.use("/api", accountRoutes);
 app.use("/api", employeeRoutes);
 app.use("/protected", protectedRoute);
 app.use("/doc", swaggerUI.serve, swaggerUI.setup(swaggerFile));
