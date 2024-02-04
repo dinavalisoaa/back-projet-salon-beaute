@@ -73,7 +73,7 @@ exports.authentication = async (req, res) => {
               });
               res.setHeader('Authorization',token);
               console.log(token);
-              res.status(200).json({ token,userId: customer._id  });
+              res.status(200).json({ token,userId: customer._id ,role: "EMP" });
       }
       else{
           throw new Error("Compte introuvable");
