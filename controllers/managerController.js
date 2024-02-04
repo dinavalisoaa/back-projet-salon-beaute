@@ -1,7 +1,7 @@
 const Manager = require("../models/manager");
 const Utils = require("../utils");
 
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 // Create a new manager
 exports.createManager = async (req, res) => {
   const { name, password, email } = req.body;
@@ -43,9 +43,9 @@ exports.authentication = async (req, res) => {
       });
       res.setHeader("Authorization", token);
       console.log(token);
-      res.status(200).json({ token, userId: manager._id });
+      res.status(200).json({ token, userId: manager._id, role: "MANAGER" });
     } else {
-      throw new Error("Compte introuvable");
+      res.status(401).json({ error: "Compte introuvable" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
