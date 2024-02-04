@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 // Create a new customer
 exports.createCustomer = async (req, res) => {
         const {  name,password,email } = req.body;
-        try {
+        try {   
           const expense = new Customer({
           });
           expense.name=name;
@@ -72,8 +72,8 @@ exports.authentication = async (req, res) => {
                 expiresIn: '15h',
                 });
                 res.setHeader('Authorization',token);
-                console.log(token);
-                res.status(200).json({ token,userId: customer._id  });
+                console.log({ token,userId: customer._id,role: "CUSTOMER", info:customer   });
+                res.status(200).json({ token,userId: customer._id,role: "CUSTOMER", info:customer   });
         }
         else{
             throw new Error("Compte introuvable");
