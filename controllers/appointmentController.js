@@ -2,23 +2,14 @@ const Appointment = require("../models/appointment");
 const Utils = require('../utils')
 const Customer = require('../models/customer');
 const Service = require('../models/service');
+const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new appointment
 exports.createAppointment = async (req, res) => {
-  const {  date,
-    customer,
-    service,
-    status,
-    isPaid } = req.body;
+  const appointment_data = req.body;
   try {
-    const appointment = new Appointment({
-      date,
-      customer,
-      service,
-      status,
-      isPaid
-    });
+    const appointment = new Appointment(appointment_data);
     const savedAppointment = await appointment.save();
     res.status(201).json(savedAppointment);
   } catch (error) {
@@ -32,18 +23,6 @@ exports.createAppointment = async (req, res) => {
 exports.getAllAppointment = async (req, res) => {
   try {
     var json_filter = {};
-    // if (req.query.description) {
-    //   json_filter.description = {
-    //     $regex: ".*" + req.query.description + ".*",
-    //   };
-    // }
-    // if (req.query.date) {
-    //   json_filter.date = req.query.date;
-    // }
-    // if (req.query.amount) {
-    //   json_filter.amount = req.query.amount;
-    // }
-
     const appointment = await Appointment.find(json_filter).populate('customer').populate('service').exec();
     res.json(appointment);
   } catch (error) {
@@ -66,13 +45,10 @@ exports.getAppointment = async (req, res) => {
       .json({ error: "An error occurred while fetching the appointment" });
   }
 };
+
 exports.payAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const { date,
-    description,
-    customer,
-    debit,
-    credit } = req.body;
+  const { date, description, customer, debit, credit } = req.body;
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
@@ -86,7 +62,6 @@ exports.payAppointment = async (req, res) => {
     appointment.credit=credit;
     appointment.description=description;
 
-    /////////////////
     const savedAppointment = await appointment.save();
 
     if (!updatedAppointment) {
@@ -99,14 +74,11 @@ exports.payAppointment = async (req, res) => {
       .json({ error: "An error occurred while updating the appointment" });
   }
 };
+
 // Update a appointment by ID
 exports.updateAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const {  date,
-    customer,
-    service,
-    status,
-    isPaid } = req.body;
+  const {  date, customer, service, status, isPaid } = req.body;
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
@@ -146,27 +118,22 @@ exports.deleteAppointment = async (req, res) => {
   }
 };
 
-exports.totalDurationAndAmount = async (req, res) => {
-  const appointmentId = req.params.id;
-  try {
-      let duration = 0;
-      let amount = 0;
-      const appointment = await Appointment.find({
-          _id: new ObjectId(appointmentId)
-      });
-      appointment.service.forEach(element => {
-          duration += element.duration;
-          amount += element.amount;
-      });
-      res.json({ duration: duration, amount: amount });
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
+function setTotalDurationAndAmount(appointment){
+  appointment.forEach(appointment => {
+    let totalDuration = 0;
+    let totalAmount = 0;
+    appointment.service.forEach(service => {
+      totalDuration += service.duration;
+      totalAmount += service.price;
+    });
+    appointment.totalDuration = Utils.convertMinutesToHoursAndMinutes(totalDuration);
+    appointment.totalAmount = totalAmount;
+  });
 }
 
 // Get customer appointment
 exports.getCustomerAppointment = async (req, res) => {
-  const customerId = req.params.id;
+  const customerId = req.params.customerId;
   try {
       const appointment = await Appointment.aggregate([
           {
@@ -181,16 +148,13 @@ exports.getCustomerAppointment = async (req, res) => {
               customer: 1, 
               service: 1,
               status: 1,
-              totalDuration: 2,   //Default value
-              totalAmount: 2      //Default value
+              totalDuration: 2,   
+              totalAmount: 2     
             },
           }
       ]);
       await Appointment.populate(appointment, [{ path: 'service' }]);
-      const totalDurationInMinutes = appointment.service.duration;
-      for (const element of appointment) {
-          // element.totalDuration = Utils.
-      };
+      setTotalDurationAndAmount(appointment);
       res.json(appointment);
   } catch (error) {
       res.status(500).json({ error: error.message });
