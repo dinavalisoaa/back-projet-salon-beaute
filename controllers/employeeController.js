@@ -90,11 +90,7 @@ exports.updateEmployee = async (req, res) => {
   duration,
   commission } = req.body;
  try {
-   const updatedEmployee = await Employee.findByIdAndUpdate(
-    
-   serviceId,{   price,
-    duration,
-    commission },{ new: true });
+   const updatedEmployee = await Employee.findByIdAndUpdate(serviceId, { price, duration, commission },{ new: true });
    if (!updatedEmployee) {
        return res.status(404).json({ error: 'Employee not found' });
    }
