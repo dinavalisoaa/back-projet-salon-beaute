@@ -78,5 +78,9 @@ exports.registration = async (req, res) => {
     }
 };
 
+exports.appointmentHistory = async (req, res) => {
+        
+};
+
 
 

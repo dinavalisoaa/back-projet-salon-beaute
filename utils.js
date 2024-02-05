@@ -11,7 +11,15 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+function convertMinutesToHoursAndMinutes(totalMinutes) {
+    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalMinutes / 60);
+  
+    return {hours, minutes};
+}
+
 module.exports = {
     encryptPassword,
-    isValidEmail
+    isValidEmail,
+    convertMinutesToHoursAndMinutes
 };
