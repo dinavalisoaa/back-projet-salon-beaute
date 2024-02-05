@@ -22,7 +22,7 @@ const protectedRoute = require("./routes/protectedRoutes");
 
 // Serve Swagger documentation
 // Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/beauty-salon");
+mongoose.connect(process.env.DATABASE_URL);
 
 // Use the cors middleware to enable Cross-Origin Resource Sharing
 app.use(cors());
