@@ -1,5 +1,6 @@
 const Employee = require('../models/employee');
 const Utils = require('../utils')
+const jwt = require('jsonwebtoken');
 
 // Create a new employee
 exports.registration = async (req, res) => {
@@ -58,7 +59,30 @@ exports.getEmployee = async (req, res) => {
    res.status(500).json({ error: 'An error occurred while fetching the employee' });
  }
 };
-
+exports.authentication = async (req, res) => {
+  try {
+      const { email, password } = req.body;
+      const customer = await Employee.findOne({
+          email: email,
+          password: Utils.encryptPassword(password)
+      })
+     
+      if(customer != null){
+          const token = jwt.sign({ userId: customer._id }, 'your-secret-key', {
+              expiresIn: '15h',
+              });
+              res.setHeader('Authorization',token);
+              console.log(token);
+              res.status(200).json({ token,userId: customer._id ,role: "EMP" });
+      }
+      else{
+          throw new Error("Compte introuvable");
+      }
+     
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
 // Update a employee by ID
 exports.updateEmployee = async (req, res) => {
  const serviceId = req.params.id;

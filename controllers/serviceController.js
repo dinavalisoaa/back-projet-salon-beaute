@@ -19,6 +19,25 @@ exports.createService = async (req, res) => {
       .json({ error: "An error occurred while creating the song" });
   }
 };
+exports.sumService = async (req, res) => {
+  const body = req.body;
+  try {
+    // const song = new Service({
+    //   name,
+    //   price,
+    //   duration,
+    //   commission,
+    //   illustration,
+    // });
+
+    // const savedService = await song.save();
+    res.status(201).json(body);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the song" });
+  }
+};
 
 // Get all songs
 exports.getAllService = async (req, res) => {
