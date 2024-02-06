@@ -16,9 +16,12 @@ exports.registration = async (req, res) => {
         throw new Error("Adresse email invalide");
       }
       const newEmployee = new Employee(employee);
+      newEmployee.dateOfBirth = new Date( employee.dateOfBirth +'T00:00:00Z')
+      newEmployee.schedule.entry = new Date('1970-01-01T'+ employee.schedule.entry +':00Z');
+      newEmployee.schedule.exit = new Date('1970-01-01T'+ employee.schedule.exit +':00Z');
       newEmployee.password = Utils.encryptPassword(employee.password);
       newEmployee.profile = null;
-      newEmployee.status = 0;
+      newEmployee.status = 1;
       const savedEmployee = await newEmployee.save();
       res.status(201).json(savedEmployee);
   } catch (error) {
@@ -59,6 +62,7 @@ exports.getEmployee = async (req, res) => {
    res.status(500).json({ error: 'An error occurred while fetching the employee' });
  }
 };
+
 exports.authentication = async (req, res) => {
   try {
       const { email, password } = req.body;
@@ -83,38 +87,42 @@ exports.authentication = async (req, res) => {
       res.status(500).json({ error: error.message });
   }
 };
+
 // Update a employee by ID
 exports.updateEmployee = async (req, res) => {
- const serviceId = req.params.id;
- const {  price,
-  duration,
-  commission } = req.body;
+ const employeeId = req.params.id;
+ const employee = req.body;
  try {
-   const updatedEmployee = await Employee.findByIdAndUpdate(serviceId, { price, duration, commission },{ new: true });
-   if (!updatedEmployee) {
-       return res.status(404).json({ error: 'Employee not found' });
-   }
-   res.json(updatedEmployee);
+    employee.schedule.entry = new Date('1970-01-01T'+ employee.schedule.entry +':00Z');
+    employee.schedule.exit = new Date('1970-01-01T'+ employee.schedule.exit +':00Z');
+    employee.profile = null;
+    employee.status = 1;
+    const updatedEmployee = await Employee.findByIdAndUpdate(employeeId, employee,{ new: true });
+    if (!updatedEmployee) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+    res.json(updatedEmployee);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while updating the employee' });
+    console.log(error);
+    res.status(500).json({ error: 'An error occurred while updating the employee' });
  }
 };
 
 // Delete a employee by ID
-exports.deleteEmployee = async (req, res) => {
- const serviceId = req.params.id;
- console.log(serviceId);
- try {
-   const deletedEmployee = await Employee.findByIdAndDelete(serviceId);
-   if (!deletedEmployee) {
- return res.status(404).json({ error: 'Employee not found' });
- }
-   res.json(deletedEmployee);
- } catch (error) {
-    console.log(error);
-   res.status(500).json({ error: 'An error occurred while deleting the employee' });
- }
-};
+// exports.deleteEmployee = async (req, res) => {
+//  const serviceId = req.params.id;
+//  console.log(serviceId);
+//  try {
+//    const deletedEmployee = await Employee.findByIdAndDelete(serviceId);
+//    if (!deletedEmployee) {
+//  return res.status(404).json({ error: 'Employee not found' });
+//  }
+//    res.json(deletedEmployee);
+//  } catch (error) {
+//     console.log(error);
+//    res.status(500).json({ error: 'An error occurred while deleting the employee' });
+//  }
+// };
 
 //Activate account
 exports.activateAccount = async (req, res) => {

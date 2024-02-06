@@ -11,6 +11,7 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const managerRoutes = require("./routes/managerRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
+const sexRoutes = require("./routes/sexRoutes");
 
 const emailRoutes = require("./routes/emailRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
@@ -38,6 +39,7 @@ app.use("/api", appointmentRoutes);
 app.use("/api", emailRoutes);
 app.use("/api", accountRoutes);
 app.use("/api", employeeRoutes);
+app.use("/api", sexRoutes);
 app.use("/protected", protectedRoute);
 app.use("/doc", swaggerUI.serve, swaggerUI.setup(swaggerFile));
 
