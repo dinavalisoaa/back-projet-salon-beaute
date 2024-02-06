@@ -8,6 +8,6 @@ router.post('/employee', employeeController.registration);
 router.put('/employee/:id', employeeController.updateEmployee);
 router.put('/employee/:id/activate', employeeController.activateAccount);
 router.put('/employee/:id/deactivate', employeeController.deactivateAccount);
-router.put('/employee/connection', employeeController.authentication);
+router.post('/employee/connection', employeeController.authentication);
 
 module.exports = router;

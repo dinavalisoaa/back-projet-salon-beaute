@@ -1,39 +1,17 @@
+const { getUser } = require("../middleware/authMiddleware");
 const Account = require("../models/accountMovement");
 const Customer = require("../models/customer");
-const {ObjectId}=require('mongodb');
+const jwt = require("jsonwebtoken");
+
+const { ObjectId } = require("mongodb");
 // Create a new song
 exports.createAccount = async (req, res) => {
   const { date, description, customer, debit, credit } = req.body;
   try {
-    const song = new Account({ date, description, customer, debit, credit });
-    const savedAccount = await song.save();
-    res.status(201).json(savedAccount);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the song",error });
-  }
-};
-
-// Get all songs
-exports.getAllAccount = async (req, res) => {
-  try {
-    const song = await Account.find();
-    res.json(song);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while fetching song" });
-  }
-};
-// Get all songs
-exports.getState = async (req, res) => {
-  try {
-    const song = await Account.aggregate([
+    const state = await Account.aggregate([
       {
         $match: {
-          customer: new ObjectId(
-            req.query.id
-          ),
+          customer: new ObjectId(customer._id),
         },
       },
       {
@@ -48,7 +26,59 @@ exports.getState = async (req, res) => {
         },
       },
     ]);
-    
+    const stateAccount = state[0].total_credit - state[0].total_debit;
+    if (stateAccount < debit) {
+      res.status(400).json({ error: "Compte insuffisant" });
+      return;
+    }
+    const song = new Account({ date, description, customer, debit, credit });
+    const savedAccount = await song.save();
+    res
+      .status(201)
+      .json({ message: "Mouvement de compte effectuee", savedAccount });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the song", error });
+  }
+};
+
+// Get all songs
+exports.getAllAccount = async (req, res) => {
+  try {
+    const token = req.header("Authorization");
+    const user = jwt.verify(token, "your-secret-key");
+    const song = await Account.find({
+      customer: user.userId,
+    });
+    res.json(song);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred while fetching song" });
+  }
+};
+// Get all songs
+exports.getState = async (req, res) => {
+  try {
+    const song = await Account.aggregate([
+      {
+        $match: {
+          customer: new ObjectId(req.query.id),
+        },
+      },
+      {
+        $group: {
+          _id: "$customer",
+          total_debit: {
+            $sum: "$debit",
+          },
+          total_credit: {
+            $sum: "$credit",
+          },
+        },
+      },
+    ]);
+
     res.json(song);
   } catch (error) {
     console.log(error);

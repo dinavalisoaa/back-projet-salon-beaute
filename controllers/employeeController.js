@@ -75,8 +75,9 @@ exports.authentication = async (req, res) => {
           const token = jwt.sign({ userId: customer._id }, 'your-secret-key', {
               expiresIn: '15h',
               });
+
               res.setHeader('Authorization',token);
-              console.log(token);
+              console.log(token.exp);
               res.status(200).json({ token,userId: customer._id ,role: "EMP" });
       }
       else{

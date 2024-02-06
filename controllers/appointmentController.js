@@ -2,10 +2,7 @@ const Appointment = require("../models/appointment");
 const Utils = require('../utils')
 const Customer = require('../models/customer');
 const Service = require('../models/service');
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
 
-// Create a new appointment
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {

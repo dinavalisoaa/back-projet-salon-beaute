@@ -308,6 +308,42 @@
         }
       }
     },
+    "/api/customer/{id}/choose/service": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "serviceId": {
+                  "example": "any"
+                },
+                "isPreferred": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/services": {
       "get": {
         "description": "",
@@ -727,32 +763,6 @@
       },
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "example": "any"
-                },
-                "customer": {
-                  "example": "any"
-                },
-                "service": {
-                  "example": "any"
-                },
-                "status": {
-                  "example": "any"
-                },
-                "isPaid": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -855,6 +865,27 @@
         }
       }
     },
+    "/api/appointment/customer/{customerId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/appointment/{id}/pay": {
       "delete": {
         "description": "",
@@ -939,6 +970,13 @@
     "/api/accounts": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1001,6 +1039,9 @@
         "responses": {
           "201": {
             "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1217,7 +1258,7 @@
       }
     },
     "/api/employee/connection": {
-      "put": {
+      "post": {
         "description": "",
         "parameters": [
           {
