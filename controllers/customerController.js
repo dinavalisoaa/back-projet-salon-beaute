@@ -102,6 +102,7 @@ exports.registration = async (req, res) => {
         const newCustomer = new Customer(customer);
         newCustomer.password = Utils.encryptPassword(customer.password);
         newCustomer.profile = null;
+        newCustomer.preference = { service: [], employee: [] };
         const savedCustomer = await newCustomer.save();
         res.status(201).json(savedCustomer);
     } catch (error) {
@@ -114,16 +115,15 @@ exports.choosePreferredService = async (req, res) => {
     const { serviceId, isPreferred } = req.body;
     try {
         const customer = await Customer.findById(customerId);
-        console.log("customer: " + customer);
         if(isPreferred){
-            customer.preference.service.push(serviceId);
-            res.status(201).json({ message: 'Service added in service preferred list' })
+            customer.preference.service.push(new ObjectId(serviceId));
         }
         else{
             const index = customer.preference.service.indexOf(serviceId);
             customer.preference.service.splice(index, 1);
-            res.status(201).json({ message: 'Service deleted from service preferred list' })
         }
+        customer.save();
+        res.status(201).json({ message: 'Action successful' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred while choosing service preference' });
@@ -138,13 +138,13 @@ exports.choosePreferredEmployee = async (req, res) => {
         console.log("customer: " + customer);
         if(isPreferred){
             customer.preference.employee.push(employeeId);
-            res.status(201).json({ message: 'Employee added in employee preferred list' })
         }
         else{
             const index = customer.preference.employee.indexOf(employeeId);
             customer.preference.employee.splice(index, 1);
-            res.status(201).json({ message: 'Employee deleted from employee preferred list' })
         }
+        customer.save();
+        res.status(201).json({ message: 'Action successful' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred while choosing employee preference' });

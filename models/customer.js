@@ -1,17 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const preference = new Schema({
-    service: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Service'
-    }],
-    employee: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Employee'
-    }]
-});
-
 const customerData = new mongoose.Schema({
     name: String,
     firstname: String,
@@ -26,7 +15,14 @@ const customerData = new mongoose.Schema({
     profile: String,
     password: String,
     preference: {
-        type: preference
+        service: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Service'
+        }],
+        employee: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Employee'
+        }]
     }
 });
 

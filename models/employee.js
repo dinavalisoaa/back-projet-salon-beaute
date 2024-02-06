@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const scheduleForm = new Schema({
-    entry: Date,
-    exit: Date
-});
-
 const employeeData = new mongoose.Schema({
     name: String,
     firstname: String,
@@ -20,7 +15,8 @@ const employeeData = new mongoose.Schema({
     profile: String,
     password: String,
     schedule: {
-        type: scheduleForm
+        entry: Date,
+        exit: Date
     },
     status: Number
 });
