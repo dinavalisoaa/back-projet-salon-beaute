@@ -1,8 +1,10 @@
 const Customer = require('../models/customer');
+const Service = require('../models/service');
 const Utils = require('../utils')
 const Sex = require('../models/sex');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const Employee = require('../models/employee');
 const ObjectId = mongoose.Types.ObjectId;
 
 // const { sendScheduledEmail } = require('./emailController');
@@ -150,3 +152,86 @@ exports.choosePreferredEmployee = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while choosing employee preference' });
     }
 };
+
+
+    async function isPreferredService(customerId, serviceId) {
+        try {
+            const preference = await Customer.find({
+                _id: new ObjectId(customerId),
+                'preference.service': { $in: [serviceId] }
+            });
+            if(preference.length > 0){
+                return true;
+            }
+            return false;
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+  
+    async function isPreferredEmployee(customerId, employeeId) {
+        try {
+            const preference = await Customer.find({
+                _id: new ObjectId(customerId),
+                'preference.employee': { $in: [employeeId] }
+            });
+            if(preference.length > 0){
+                return true;
+            }
+            return false;
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+  exports.getServiceWithPreference = async (req, res) => {
+    const customerId = req.params.customerId;
+    try{
+        const service = await Service.aggregate([
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+                price: 1, 
+                duration: 1,
+                commission: 1,
+                illustration: 1,   
+                isPreference: 2     
+              },
+            }
+        ]);
+        for (const element of service) {
+            const serviceId = element._id;
+            element.isPreference = await isPreferredService(customerId, serviceId);
+        }
+        res.json(service);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching service" });
+    }
+  };
+
+  exports.getEmployeeWithPreference = async (req, res) => {
+    const customerId = req.params.customerId;
+    try{
+        const employee = await Employee.aggregate([
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+                firstname: 1, 
+                profile: 1,
+                isPreference: 2     
+              },
+            }
+        ]);
+        for (const element of employee) {
+            const employeeId = element._id;
+            element.isPreference = await isPreferredEmployee(customerId, employeeId);
+        }
+        res.json(employee);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching service" });
+    }
+  };

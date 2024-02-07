@@ -19,6 +19,7 @@ exports.createService = async (req, res) => {
       .json({ error: "An error occurred while creating the song" });
   }
 };
+
 exports.sumService = async (req, res) => {
   const body = req.body;
   try {
@@ -58,10 +59,10 @@ exports.getAllService = async (req, res) => {
       json_filter.commission = req.query.commission;
     }
 
-    const song = await Service.find(json_filter);
-    res.json(song);
+    const service = await Service.find(json_filter);
+    res.json(service);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while fetching song" });
+    res.status(500).json({ error: "An error occurred while fetching service" });
   }
 };
 
