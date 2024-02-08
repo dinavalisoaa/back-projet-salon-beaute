@@ -102,6 +102,7 @@ exports.registration = async (req, res) => {
             throw new Error("Adresse email invalide");
         }
         const newCustomer = new Customer(customer);
+        newCustomer.dateOfBirth = new Date( customer.dateOfBirth +'T00:00:00Z')
         newCustomer.password = Utils.encryptPassword(customer.password);
         newCustomer.profile = null;
         newCustomer.preference = { service: [], employee: [] };
