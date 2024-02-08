@@ -2,11 +2,14 @@ const Appointment = require("../models/appointment");
 const Utils = require('../utils')
 const Customer = require('../models/customer');
 const Service = require('../models/service');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {
     const appointment = new Appointment(appointment_data);
+    appointment.status = 1;
     const savedAppointment = await appointment.save();
     res.status(201).json(savedAppointment);
   } catch (error) {

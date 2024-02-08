@@ -11,7 +11,7 @@ const appointmentData = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Service'
     }],
-    status: Number, //Fait, a venir, annule
+    status: Number, //achevé(2), inachevé(1), annulé(0)
     isPaid: Boolean
 });
 
