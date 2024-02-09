@@ -1,7 +1,5 @@
 const Appointment = require("../models/appointment");
 const Utils = require('../utils')
-const Customer = require('../models/customer');
-const Service = require('../models/service');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -48,7 +46,7 @@ exports.getAppointment = async (req, res) => {
 
 exports.payAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const { date, description, customer, debit, credit } = req.body;
+  const { date, description, debit, credit } = req.body;
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
@@ -62,7 +60,6 @@ exports.payAppointment = async (req, res) => {
     appointment.credit=credit;
     appointment.description=description;
 
-    const savedAppointment = await appointment.save();
 
     if (!updatedAppointment) {
       return res.status(404).json({ error: "Appointment not found" });
