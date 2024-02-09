@@ -6,12 +6,11 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Employee = require('../models/employee');
 const ObjectId = mongoose.Types.ObjectId;
-
-// const { sendScheduledEmail } = require('./emailController');
+const utilController = require('./utilController');
 
 // Create a new customer
 exports.createCustomer = async (req, res) => {
-        const {  name,password,email } = req.body;
+        const { name,password,email } = req.body;
         try {   
           const expense = new Customer({
           });
@@ -48,14 +47,6 @@ exports.getUserConnected = async (req, res) => {
 exports.getAllCustomer = async (req, res) => {
     try {
         const customer = await Customer.find().populate('sex').exec();
-
-        // const date = new Date(2024,1,1,14,10);
-        // const recipient = 'lalaina.nancia64@gmail.com';
-        // const subject = 'Test email programme';
-        // const message = 'Test email programme sur express.js';
-
-        // await sendScheduledEmail({ body: { date, recipient, subject, message } }, null);
-
         res.json(customer);
     } catch (error) {
         res.status(500).json({ error: error.message });
