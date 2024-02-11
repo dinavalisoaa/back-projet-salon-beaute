@@ -1,32 +1,81 @@
 const Appointment = require("../models/appointment");
-const Utils = require('../utils')
-const Customer = require('../models/customer');
-const Service = require('../models/service');
-const mongoose = require('mongoose');
+const Utils = require("../utils");
+const Customer = require("../models/customer");
+const Service = require("../models/service");
+const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-
+mongoose.m;
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {
     const appointment = new Appointment(appointment_data);
-    appointment.status = 1;
     const savedAppointment = await appointment.save();
     res.status(201).json(savedAppointment);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: error });
+    res.status(500).json({ error: error });
   }
 };
 
 // Get all appointments
 exports.getAllAppointment = async (req, res) => {
+  var json_filter = req.body;
+  var json_entry = {};
+  let customer = json_filter?.customer;
+  let status = json_filter?.status;
+  let service = json_filter?.service;
+  let serviceId = [];
+  let querys = req.query.year;
+  if (querys) {
+    json_entry.$expr = {
+      $and: [
+        { $eq: [{ $year: "$date" }, req.query.year] },
+        { $eq: [{ $month: "$date" }, req.query.month] },
+        { $eq: [{ $dayOfMonth: "$date" }, req.query.day] },
+      ],
+    };
+    // querys=
+  }
+  if (
+    json_filter.service != undefined &&
+    json_filter.service != "" &&
+    json_filter.service.length != 0
+  ) {
+    service.forEach((element) => {
+      serviceId.push(new ObjectId(element._id));
+    });
+    json_entry.service = {
+      $in: serviceId,
+    };
+  }
+
+  if (customer != undefined) {
+    json_entry.customer = new ObjectId(customer._id);
+  }
+  if (json_filter.date != undefined && json_filter.date != "") {
+    // json_entry.date =mongoose.Types.Date (json_filter.date);
+  }
+  if (status != undefined) {
+    json_entry.status = status;
+  }
+  console.log(JSON.stringify(json_entry) + "<<<<");
+  // let date = req.query.sort;
+  var sort_json = {}; //req.body;
+  // if (date) {
+  //   sort_json.date = date;
+  // }
   try {
     var json_filter = {};
-    const appointment = await Appointment.find(json_filter).populate('customer').populate('service').exec();
+    const appointment = await Appointment.find(json_entry)
+      .populate("customer")
+      .populate("service")
+      .sort(sort_json)
+      .exec();
+
     res.json(appointment);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while fetching appointment" });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching appointment" });
   }
 };
 
@@ -52,15 +101,15 @@ exports.payAppointment = async (req, res) => {
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      {isPaid:true },
+      { isPaid: true },
       { new: true }
     );
-   
-    const appointment=new Appointment();
-    appointment.date=date;
-    appointment.debit=debit;
-    appointment.credit=credit;
-    appointment.description=description;
+
+    const appointment = new Appointment();
+    appointment.date = date;
+    appointment.debit = debit;
+    appointment.credit = credit;
+    appointment.description = description;
 
     const savedAppointment = await appointment.save();
 
@@ -78,15 +127,11 @@ exports.payAppointment = async (req, res) => {
 // Update a appointment by ID
 exports.updateAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const {  date, customer, service, status, isPaid } = req.body;
+  const { date, customer, service, status, isPaid } = req.body;
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { date,
-        customer,
-        service,
-        status,
-        isPaid },
+      { date, customer, service, status, isPaid },
       { new: true }
     );
     if (!updatedAppointment) {
@@ -100,12 +145,33 @@ exports.updateAppointment = async (req, res) => {
   }
 };
 
+exports.patchAppointment = async (req, res) => {
+  const appointmentId = req.params.id;
+  const { status } = req.body;
+  try {
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      appointmentId,
+      { status },
+      { new: true }
+    );
+    if (!updatedAppointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+    res.json(updatedAppointment);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the appointment" });
+  }
+};
 // Delete a appointment by ID
 exports.deleteAppointment = async (req, res) => {
   const appointmentId = req.params.id;
   console.log(appointmentId);
   try {
-    const deletedAppointment = await Appointment.findByIdAndDelete(appointmentId);
+    const deletedAppointment = await Appointment.findByIdAndDelete(
+      appointmentId
+    );
     if (!deletedAppointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
@@ -118,15 +184,16 @@ exports.deleteAppointment = async (req, res) => {
   }
 };
 
-function setTotalDurationAndAmount(appointment){
-  appointment.forEach(appointment => {
+function setTotalDurationAndAmount(appointment) {
+  appointment.forEach((appointment) => {
     let totalDuration = 0;
     let totalAmount = 0;
-    appointment.service.forEach(service => {
+    appointment.service.forEach((service) => {
       totalDuration += service.duration;
       totalAmount += service.price;
     });
-    appointment.totalDuration = Utils.convertMinutesToHoursAndMinutes(totalDuration);
+    appointment.totalDuration =
+      Utils.convertMinutesToHoursAndMinutes(totalDuration);
     appointment.totalAmount = totalAmount;
   });
 }
@@ -135,28 +202,28 @@ function setTotalDurationAndAmount(appointment){
 exports.getCustomerAppointment = async (req, res) => {
   const customerId = req.params.customerId;
   try {
-      const appointment = await Appointment.aggregate([
-          {
-              $match: {
-                  customer: new ObjectId(customerId)
-              }
-          },
-          {
-            $project: {
-              _id: 1,
-              date: 1,
-              customer: 1, 
-              service: 1,
-              status: 1,
-              totalDuration: 2,   
-              totalAmount: 2     
-            },
-          }
-      ]);
-      await Appointment.populate(appointment, [{ path: 'service' }]);
-      setTotalDurationAndAmount(appointment);
-      res.json(appointment);
+    const appointment = await Appointment.aggregate([
+      {
+        $match: {
+          customer: new ObjectId(customerId),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          customer: 1,
+          service: 1,
+          status: 1,
+          totalDuration: 2,
+          totalAmount: 2,
+        },
+      },
+    ]);
+    await Appointment.populate(appointment, [{ path: "service" }]);
+    setTotalDurationAndAmount(appointment);
+    res.json(appointment);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

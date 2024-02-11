@@ -7,6 +7,7 @@ const { ObjectId } = require("mongodb");
 // Create a new song
 exports.createAccount = async (req, res) => {
   const { date, description, customer, debit, credit } = req.body;
+  console.log(req.body);
   try {
     const state = await Account.aggregate([
       {
@@ -26,12 +27,21 @@ exports.createAccount = async (req, res) => {
         },
       },
     ]);
-    const stateAccount = state[0].total_credit - state[0].total_debit;
+
+    let stateAccount = 0;
+
+    if (state.length > 0) {
+      stateAccount = state[0].total_credit - state[0].total_debit;
+
+    }
+
     if (stateAccount < debit) {
       res.status(400).json({ error: "Compte insuffisant" });
       return;
     }
+
     const song = new Account({ date, description, customer, debit, credit });
+
     const savedAccount = await song.save();
     res
       .status(201)
