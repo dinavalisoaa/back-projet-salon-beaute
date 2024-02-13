@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
+const cron = require('node-cron');
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -9,13 +11,11 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Route pour envoyer un email
-// app.post('/envoyer-email', (req, res) => {
 exports.sendEmail = async (req, res) => {
-    const { recipient, subject, message } = req.body;
+    const { shipper, recipient, subject, message } = req.body;
 
     const mailOptions = {
-        from: process.env.USER,
+        from: shipper + ' <' + process.env.USER + '>',
         to: recipient,
         subject: subject,
         text: message
@@ -33,28 +33,8 @@ exports.sendEmail = async (req, res) => {
 };
 
 exports.sendScheduledEmail = async (req, res) => {
-    const { date, recipient, subject, message } = req.body;
-
-    console.log("Fonction email");
-
-    const envoiEmail = schedule.scheduleJob(date, () => {
-        const mailOptions = {
-            from: process.env.USER,
-            to: recipient,
-            subject: subject,
-            text: message
-        };
-
-        console.log("Fonction email 2");
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error(error);
-                console.error('Erreur lors de l\'envoi de l\'email :', error);
-            } else {
-                console.log('E-mail envoyé: ' + info.response);
-                console.log('Email envoyé avec succès :', info.response);
-            }
-        });
+    const { date, shipper, recipient, subject, message } = req.body;
+    cron.schedule(`${date.minute} ${date.hour} ${date.day} ${date.month} *`, () => {
+        this.sendEmail({body: {shipper, recipient, subject, message}});
     });
 };
