@@ -1,0 +1,15 @@
+{
+  "name": "Rakoto",
+  "firstname": "Koto",
+  "dateOfBirth": "2022-01-02",
+  "sex": "65c17b822d9a8d36ad7a2413",
+  "address": "123434",
+  "phoneNumber": "1023432",
+  "email": "rakotoemp@gmail.com",
+  "password": "emp",
+  "confirmationPassword": "emp",
+  "schedule": {
+"entry":"13:10",
+"exit":"14:10"
+}
+}
