@@ -2,14 +2,15 @@ const Appointment = require("../models/appointment");
 // const Utils = require("../utils");
 const Customer = require("../models/customer");
 const Service = require("../models/service");
-const Utils = require('../utils')
-const mongoose = require('mongoose');
+const Utils = require("../utils");
+const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 mongoose.m;
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {
     const appointment = new Appointment(appointment_data);
+    appointment.employee = null;
     const savedAppointment = await appointment.save();
     res.status(201).json(savedAppointment);
   } catch (error) {
@@ -58,8 +59,6 @@ exports.getAllAppointment = async (req, res) => {
   if (status != undefined) {
     json_entry.status = status;
   }
-  console.log(JSON.stringify(json_entry) + "<<<<");
-  // let date = req.query.sort;
   var sort_json = {}; //req.body;
   // if (date) {
   //   sort_json.date = date;
@@ -112,7 +111,6 @@ exports.payAppointment = async (req, res) => {
     appointment.credit = credit;
     appointment.description = description;
 
-
     if (!updatedAppointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
@@ -147,11 +145,25 @@ exports.updateAppointment = async (req, res) => {
 
 exports.patchAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const { status } = req.body;
+  const { status, employee } = req.body;
+  // console.log(appointmentId);
+  const employees = new ObjectId(employee?._id);
+  console.log(employees + "<<<<");
+
   try {
+    const current = await Appointment.findById(appointmentId).exec();
+    if (current.employee != null) {
+      if (current.employee._id != employee._id) {
+        console.log("console.log()" + current.employee + " VS " + employee._id);
+        return res
+          .status(403)
+          .json({ error: "La tache ne vous appartienne pas" });
+      }
+    }
+
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { status },
+      { status, employee: employees },
       { new: true }
     );
     if (!updatedAppointment) {
@@ -161,7 +173,7 @@ exports.patchAppointment = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ error: "An error occurred while updating the appointment" });
+      .json({ error: "An error occurred while updating the appointment"+error });
   }
 };
 // Delete a appointment by ID
