@@ -2,7 +2,6 @@ const Appointment = require("../models/appointment");
 // const Utils = require("../utils");
 const Customer = require("../models/customer");
 const Service = require("../models/service");
-const mongoose = require("mongoose");
 const Utils = require('../utils')
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
