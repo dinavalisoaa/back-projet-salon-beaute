@@ -14,6 +14,7 @@ const customerData = new mongoose.Schema({
     email: String,
     profile: String,
     password: String,
+    
     preference: {
         service: [{
             type: Schema.Types.ObjectId,
