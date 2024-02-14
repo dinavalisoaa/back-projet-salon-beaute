@@ -2,21 +2,15 @@ const Service = require("../models/service");
 
 // Create a new song
 exports.createService = async (req, res) => {
-  const { name, price, duration, commission, illustration } = req.body;
+  const service = req.body;
   try {
-    const song = new Service({
-      name,
-      price,
-      duration,
-      commission,
-      illustration,
-    });
-    const savedService = await song.save();
+    const newService = new Service(service);
+    const savedService = await newService.save();
     res.status(201).json(savedService);
   } catch (error) {
     res
       .status(500)
-      .json({ error: "An error occurred while creating the song" });
+      .json({ error: "An error occurred while creating the service" });
   }
 };
 
