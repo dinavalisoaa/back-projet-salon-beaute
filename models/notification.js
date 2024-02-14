@@ -5,22 +5,13 @@ const notificationData = new mongoose.Schema({
     date: Date,
     content: String,
     sender: {
-        type: Schema.Types.ObjectId,
-        ref: 'Customer'
-    },
-    sender: {
-        type: Schema.Types.ObjectId,
-        refPath: 'senderModel', 
-        required: true
-    },
-    senderModel: {
-        type: String,
-        required: true,
-        enum: ['Customer', 'Employee'] 
+        type: Schema.Types.ObjectId
     },
     recipient: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Customer'
+        id: {
+            type: Schema.Types.ObjectId
+        },
+        status: Number  //0: non lu, 1: lu, 2: vu
     }]
 });
 
