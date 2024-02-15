@@ -23,6 +23,7 @@ exports.getAllAppointment = async (req, res) => {
   var json_filter = req.body;
   var json_entry = {};
   let customer = json_filter?.customer;
+  let emp = json_filter?.employee;
   let status = json_filter?.status;
   let service = json_filter?.service;
   let serviceId = [];
@@ -59,6 +60,12 @@ exports.getAllAppointment = async (req, res) => {
   if (status != undefined) {
     json_entry.status = status;
   }
+  if (emp != undefined) {
+    console.log(emp._id);
+
+    json_entry.employee = new ObjectId(emp._id);
+  }
+  console.log(json_entry);
   var sort_json = {}; //req.body;
   // if (date) {
   //   sort_json.date = date;
@@ -68,6 +75,7 @@ exports.getAllAppointment = async (req, res) => {
     const appointment = await Appointment.find(json_entry)
       .populate("customer")
       .populate("service")
+      .populate("employee")
       .sort(sort_json)
       .exec();
 
@@ -147,12 +155,15 @@ exports.patchAppointment = async (req, res) => {
   const appointmentId = req.params.id;
   const { status, employee } = req.body;
   // console.log(appointmentId);
-  const employees = new ObjectId(employee?._id);
+  let employees = null;
+  if (employee != null && employee != undefined) {
+    employees = new ObjectId(employee?._id);
+  }
   console.log(employees + "<<<<");
 
   try {
     const current = await Appointment.findById(appointmentId).exec();
-    if (current.employee != null) {
+    if (current.employee != null && employee != null) {
       if (current.employee._id != employee._id) {
         console.log("console.log()" + current.employee + " VS " + employee._id);
         return res
@@ -171,9 +182,9 @@ exports.patchAppointment = async (req, res) => {
     }
     res.json(updatedAppointment);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while updating the appointment"+error });
+    res.status(500).json({
+      error: "An error occurred while updating the appointment" + error,
+    });
   }
 };
 // Delete a appointment by ID
