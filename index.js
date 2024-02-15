@@ -13,6 +13,7 @@ const appointmentRoutes = require("./routes/appointmentRoutes");
 const sexRoutes = require("./routes/sexRoutes");
 const specialOfferRoutes = require("./routes/specialOfferRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const emailRoutes = require("./routes/emailRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
@@ -43,6 +44,7 @@ app.use("/api", employeeRoutes);
 app.use("/api", sexRoutes);
 app.use("/api", specialOfferRoutes);
 app.use("/api", notificationRoutes);
+app.use("/api", dashboardRoutes);
 app.use("/protected", protectedRoute);
 app.use("/doc", swaggerUI.serve, swaggerUI.setup(swaggerFile));
 
