@@ -1,112 +1,156 @@
-const Employee = require('../models/employee');
-const Utils = require('../utils')
-const jwt = require('jsonwebtoken');
+const Employee = require("../models/employee");
+const Utils = require("../utils");
+const jwt = require("jsonwebtoken");
 
 // Create a new employee
 exports.registration = async (req, res) => {
   const employee = req.body;
   try {
-      if(employee.name == null || employee.firstname == null || employee.dateOfBirth == null || employee.sex == null || employee.address == null ||  employee.phoneNumber == null || employee.email == null || employee.password == null || employee.confirmationPassword == null){
-        throw new Error("Veuillez remplir les champs obligatoires");
-      }
-      if(employee.password != employee.confirmationPassword){
-        throw new Error("Mot de passe de confirmation invalide");
-      }
-      if(!Utils.isValidEmail(employee.email)){
-        throw new Error("Adresse email invalide");
-      }
-      const newEmployee = new Employee(employee);
-      newEmployee.dateOfBirth = new Date( employee.dateOfBirth +'T00:00:00Z')
-      newEmployee.schedule.entry = new Date('1970-01-01T'+ employee.schedule.entry +':00Z');
-      newEmployee.schedule.exit = new Date('1970-01-01T'+ employee.schedule.exit +':00Z');
-      newEmployee.password = Utils.encryptPassword(employee.password);
-      newEmployee.profile = null;
-      newEmployee.status = 1;
-      const savedEmployee = await newEmployee.save();
-      res.status(201).json(savedEmployee);
+    if (
+      employee.name == null ||
+      employee.firstname == null ||
+      employee.dateOfBirth == null ||
+      employee.sex == null ||
+      employee.address == null ||
+      employee.phoneNumber == null ||
+      employee.email == null ||
+      employee.password == null ||
+      employee.confirmationPassword == null
+    ) {
+      throw new Error("Veuillez remplir les champs obligatoires");
+    }
+    if (employee.password != employee.confirmationPassword) {
+      throw new Error("Mot de passe de confirmation invalide");
+    }
+    if (!Utils.isValidEmail(employee.email)) {
+      throw new Error("Adresse email invalide");
+    }
+    const newEmployee = new Employee(employee);
+    newEmployee.dateOfBirth = new Date(employee.dateOfBirth + "T00:00:00Z");
+    newEmployee.schedule.entry = new Date(
+      "1970-01-01T" + employee.schedule.entry + ":00Z"
+    );
+    newEmployee.schedule.exit = new Date(
+      "1970-01-01T" + employee.schedule.exit + ":00Z"
+    );
+    newEmployee.password = Utils.encryptPassword(employee.password);
+    newEmployee.profile = null;
+    newEmployee.status = 1;
+    const savedEmployee = await newEmployee.save();
+    res.status(201).json(savedEmployee);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Get all employee
 exports.getAllEmployee = async (req, res) => {
   try {
-    const employee = await Employee.find().populate('sex');
+    const employee = await Employee.find().populate("sex");
     res.json(employee);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while fetching employee' });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching employee" });
   }
 };
 
 //Get active employee
 exports.getActiveEmployee = async (req, res) => {
   try {
-    const employee = await Employee.find({ status: { $gt: 0 } }).populate('sex');
+    const employee = await Employee.find({ status: { $gt: 0 } }).populate(
+      "sex"
+    );
     res.json(employee);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while fetching employee' });
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching employee" });
   }
 };
 
 // Get a specific employee by ID
 exports.getEmployee = async (req, res) => {
- const employeeId = req.params.id;
- try {
-   const employee = await Employee.findById(employeeId).populate('sex');
-     if (!employee) {
-       return res.status(404).json({ error: 'Employee not found' });
-       }
-       res.json(employee);
- } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching the employee' });
- }
+  const employeeId = req.params.id;
+  try {
+    const employee = await Employee.findById(employeeId).populate("sex");
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+    res.json(employee);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the employee" });
+  }
 };
 
 exports.authentication = async (req, res) => {
   try {
-      const { email, password } = req.body;
-      const customer = await Employee.findOne({
-          email: email,
-          password: Utils.encryptPassword(password)
-      })
-     
-      if(customer != null){
-          const token = jwt.sign({ userId: customer._id }, 'your-secret-key', {
-              expiresIn: '15h',
-              });
+    const { email, password } = req.body;
+    const customer = await Employee.findOne({
+      email: email,
+      password: Utils.encryptPassword(password),
+    });
 
-              res.setHeader('Authorization',token);
-              console.log(token.exp);
-              res.status(200).json({ token,userId: customer._id ,role: "EMP",info:customer  });
-      }
-      else{
-          throw new Error("Compte introuvable");
-      }
-     
+    if (customer != null) {
+      const token = jwt.sign({ userId: customer._id }, "your-secret-key", {
+        expiresIn: "15h",
+      });
+
+      res.setHeader("Authorization", token);
+      console.log(token.exp);
+      res
+        .status(200)
+        .json({ token, userId: customer._id, role: "EMP", info: customer });
+    } else {
+      throw new Error("Compte introuvable");
+    }
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Update a employee by ID
 exports.updateEmployee = async (req, res) => {
- const employeeId = req.params.id;
- const employee = req.body;
- try {
-    employee.schedule.entry = new Date('1970-01-01T'+ employee.schedule.entry +':00Z');
-    employee.schedule.exit = new Date('1970-01-01T'+ employee.schedule.exit +':00Z');
-    employee.profile = null;
+  const employeeId = req.params.id;
+  const employee = req.body;
+  try {
+    console.log(employee.schedule.entry);
+    employee.schedule.entry = new Date(
+      "1970-01-01T" + employee.schedule.entry + ":00Z"
+    );
+    employee.schedule.exit = new Date(
+      "1970-01-01T" + employee.schedule.exit + ":00Z"
+    );
+    if(employee.schedule.entry==undefined || employee.schedule.exit==undefined){
+        throw new Error("Remplir");
+    }
+
+    if (
+      employee.profile == undefined ||
+      employee.profile == "" ||
+      employee.profile == null
+    ) {
+      employee.profile = null;
+    }
     employee.status = 1;
-    const updatedEmployee = await Employee.findByIdAndUpdate(employeeId, employee,{ new: true });
+    console.log(employeeId);
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      employeeId,
+      employee,
+      { new: true }
+    );
     if (!updatedEmployee) {
-        return res.status(404).json({ error: 'Employee not found' });
+      return res.status(404).json({ error: "Employee not found" });
     }
     res.json(updatedEmployee);
- } catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'An error occurred while updating the employee' });
- }
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the employee" });
+  }
 };
 
 // Delete a employee by ID
@@ -130,13 +174,18 @@ exports.activateAccount = async (req, res) => {
   const employeeId = req.params.id;
   const employee = req.body;
   try {
-    const updatedEmployee = await Employee.updateOne({ _id: employeeId }, { $set: { status: 1 } });
+    const updatedEmployee = await Employee.updateOne(
+      { _id: employeeId },
+      { $set: { status: 1 } }
+    );
     if (!updatedEmployee) {
-        return res.status(404).json({ error: 'Employee not found' });
+      return res.status(404).json({ error: "Employee not found" });
     }
     res.json(updatedEmployee);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while updating the employee' });
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the employee" });
   }
 };
 
@@ -144,12 +193,17 @@ exports.activateAccount = async (req, res) => {
 exports.deactivateAccount = async (req, res) => {
   const employeeId = req.params.id;
   try {
-    const updatedEmployee = await Employee.updateOne({ _id: employeeId }, { $set: { status: 0 } });
+    const updatedEmployee = await Employee.updateOne(
+      { _id: employeeId },
+      { $set: { status: 0 } }
+    );
     if (!updatedEmployee) {
-        return res.status(404).json({ error: 'Employee not found' });
+      return res.status(404).json({ error: "Employee not found" });
     }
     res.json(updatedEmployee);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while updating the employee' });
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the employee" });
   }
 };
