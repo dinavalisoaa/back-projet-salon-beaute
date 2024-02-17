@@ -1,5 +1,6 @@
 const utilController = require("./utilController");
 const Appointment = require("../models/appointment");
+const Expense = require("../models/expense");
 
 // Temps moyen de travail pour chaque employé
 exports.employeeAverageWorkingTime = async (req, res) => {
@@ -61,6 +62,40 @@ exports.employeeAverageWorkingTime = async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching data" });
     }
 };
+
+// Nombre de reservation par jour (Liste des jours avec reservations)
+exports.listOfReservationsPerDay = async (req, res) => {
+    try {
+        const reservations = await Appointment.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$date" },
+                        month: { $month: "$date" },
+                        day: { $dayOfMonth: "$date" },
+                        employee: "$employee"
+                    },
+                    numberOfReservations: { $sum: 1 }
+                }
+            }
+        ]);
+        res.json(reservations);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+};
+
+//Liste complet de toutes les réservations
+exports.listOfAllReservations = async (req, res) => {
+    try {
+        const reservations = await Appointment.find().populate('customer');
+        res.json(reservations);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+}
 
 // Nombre de reservation par jour (pour chaque jour)
 exports.numberOfReservationsPerDay = async (req, res) => {
@@ -326,6 +361,70 @@ exports.salesPerMonth = async (req, res) => {
             statistics.push({
                 month: element,
                 sales: await salesAmount(year, element.monthNumber)
+            })
+        }
+        res.json(statistics);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+}
+
+// Dépenses d'un mois
+async function expensesAmount(year, month) {
+    var expensesValue = 0;
+    try {
+        const expenses = await Expense.aggregate([
+            {
+                $addFields: {
+                  year: { $year: "$date" },
+                  month: { $month: "$date" }
+                }
+            },
+            {
+                $match: {
+                    year: Number(year),
+                    month: Number(month)
+                }
+            },
+            {
+                $project: {
+                    expenses: { $sum: "$amount" }
+                }
+            }
+        ]);
+        if(expenses.length > 0){
+            expensesValue = expenses[0].expenses;
+        }
+        return expensesValue;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+async function profitsAmount(year, month) {
+    try {
+        const sales = await salesAmount(year, month);
+        console.log("SALES: " + sales);
+        const expenses = await expensesAmount(year, month);
+        console.log("EXPENSES: " + expenses);
+        return sales - expenses;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Benefices par mois (en entrant les depenses)
+exports.profitsPerMonth = async (req, res) => {
+    const year = req.params.year;
+    const months = utilController.getAllMonths();
+    const statistics = [];
+    try {
+        for(const element of months){
+            console.log(await profitsAmount(year, element.monthNumber));
+            statistics.push({
+                month: element,
+                profits: await profitsAmount(year, element.monthNumber)
             })
         }
         res.json(statistics);
