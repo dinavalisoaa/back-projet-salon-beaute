@@ -11,5 +11,7 @@ router.post('/customer/registration', customerController.registration);
 router.post('/current-user', customerController.getUserConnected);
 router.put('/customer/:id/choose/service', customerController.choosePreferredService);
 router.put('/customer/:id/choose/employee', customerController.choosePreferredEmployee);
+router.get('/customer/:id', customerController.getCustomer);
+router.put('/customer/:id', customerController.updateCustomer);
 
 module.exports = router;

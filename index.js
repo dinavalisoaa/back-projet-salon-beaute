@@ -26,6 +26,7 @@ const protectedRoute = require("./routes/protectedRoutes");
 // Serve Swagger documentation
 // Connect to MongoDB
 mongoose.connect(process.env.DATABASE_URL);
+// mongoose.connect("mongodb://127.0.0.1:27017/beauty-salon");
 
 // Use the cors middleware to enable Cross-Origin Resource Sharing
 app.use(cors());
@@ -67,7 +68,6 @@ app.use(function (req, res, next) {
     const decoded = jwt.verify(token, "your-secret-key");
     req.userId = decoded.userId;
     next();
-    
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });
   }
