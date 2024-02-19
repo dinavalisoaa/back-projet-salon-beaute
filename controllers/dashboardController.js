@@ -195,7 +195,7 @@ exports.numberOfReservationsPerMonth = async (req, res) => {
 
 // Chiffre d'affaires par jour (pour chaque jour)
 exports.salesPerDay = async (req, res) => {
-    const { date } = req.body;
+    const date = req.query.date;
     var sales = 0;
     try {
         var d = new Date(date);
@@ -457,7 +457,7 @@ exports.monthlyFinancialReview = async (req, res) => {
 }
 
 //Chiffre d'affaires total
-async function totalSalesAmount(year, month) {
+async function totalSalesAmount() {
     var sales = 0;
     try {
         const appointments = await Appointment.aggregate([
@@ -496,3 +496,48 @@ async function totalSalesAmount(year, month) {
         console.log(error);
     }
 };
+
+async function totalExpensesAmount() {
+    var expensesValue = 0;
+    try {
+        const expenses = await Expense.aggregate([
+            {
+                $project: {
+                    expenses: { $sum: "$amount" }
+                }
+            }
+        ]);
+        if(expenses.length > 0){
+            expensesValue = expenses[0].expenses;
+        }
+        return expensesValue;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+async function totalProfitsAmount() {
+    try {
+        const sales = await totalSalesAmount();
+        const expenses = await totalExpensesAmount();
+        return sales - expenses;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.totalAmount = async (req, res) => {
+    try {
+        const sales = await totalSalesAmount();
+        const expenses = await totalExpensesAmount();
+        const profits = await totalProfitsAmount();
+        res.json({
+            sales: sales,
+            expenses: expenses,
+            profits: profits
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+}
