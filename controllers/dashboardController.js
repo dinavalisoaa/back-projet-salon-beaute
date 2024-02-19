@@ -457,51 +457,42 @@ exports.monthlyFinancialReview = async (req, res) => {
 }
 
 //Chiffre d'affaires total
-// async function totalSalesAmount(year, month) {
-//     var sales = 0;
-//     try {
-//         const appointments = await Appointment.aggregate([
-//             {
-//                 $match: {
-//                     isPaid: true
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: "services", 
-//                     localField: "service",
-//                     foreignField: "_id",
-//                     as: "service"
-//                 }
-//             },
-//             {
-//                 $addFields: {
-//                     sumAmount: {
-//                         $sum: "$service.price"
-//                     }
-//                 }
-//             },
-//             {
-//                 $group: {
-//                     _id: {
-//                         year: { $year: "$date" },
-//                         month: { $month: "$date" }
-//                     },
-//                     sales: { $sum: "$sumAmount" }
-//                 }
-//             },
-//             {
-//                 $match: {
-//                     '_id.year': Number(year),
-//                     '_id.month': Number(month)
-//                 }
-//             }
-//         ]);
-//         if(appointments.length > 0){
-//             sales = appointments[0].sales;
-//         } 
-//         return sales;
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
+async function totalSalesAmount(year, month) {
+    var sales = 0;
+    try {
+        const appointments = await Appointment.aggregate([
+            {
+                $match: {
+                    isPaid: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "services", 
+                    localField: "service",
+                    foreignField: "_id",
+                    as: "service"
+                }
+            },
+            {
+                $addFields: {
+                    sumAmount: {
+                        $sum: "$service.price"
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    sales: { $sum: "$sumAmount" }
+                }
+            }
+        ]);
+        if(appointments.length > 0){
+            sales = appointments[0].sales;
+        } 
+        return sales;
+    } catch (error) {
+        console.log(error);
+    }
+};
