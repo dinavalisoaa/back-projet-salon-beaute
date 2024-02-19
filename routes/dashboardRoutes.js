@@ -12,5 +12,6 @@ router.get('/dashboard/sales/per/day', dashboardController.salesPerDay);
 router.get('/dashboard/sales/average/per/day', dashboardController.averageSalesPerDay);
 router.get('/dashboard/sales/:year/per/month', dashboardController.salesPerMonth);
 router.get('/dashboard/profits/:year/per/month', dashboardController.profitsPerMonth);
+router.get('/dashboard/financial-review/:year/per/month', dashboardController.monthlyFinancialReview);
 
 module.exports = router;
