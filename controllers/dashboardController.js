@@ -53,7 +53,7 @@ exports.employeeAverageWorkingTime = async (req, res) => {
             },
             {
                 $sort: { averageWorkingTime: -1 }
-            }
+            },
         ]);
         await Appointment.populate(tasks, [{ path: "employee" }]);
         res.json(tasks);
@@ -433,3 +433,75 @@ exports.profitsPerMonth = async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching data" });
     }
 }
+
+//Bilan financier mensuel
+exports.monthlyFinancialReview = async (req, res) => {
+    const year = req.params.year;
+    const months = utilController.getAllMonths();
+    const statistics = [];
+    try {
+        for(const element of months){
+            console.log(await profitsAmount(year, element.monthNumber));
+            statistics.push({
+                month: element,
+                sales: await salesAmount(year, element.monthNumber),
+                expenses: await expensesAmount(year, element.monthNumber),
+                profits: await profitsAmount(year, element.monthNumber)
+            })
+        }
+        res.json(statistics);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+}
+
+//Chiffre d'affaires total
+// async function totalSalesAmount(year, month) {
+//     var sales = 0;
+//     try {
+//         const appointments = await Appointment.aggregate([
+//             {
+//                 $match: {
+//                     isPaid: true
+//                 }
+//             },
+//             {
+//                 $lookup: {
+//                     from: "services", 
+//                     localField: "service",
+//                     foreignField: "_id",
+//                     as: "service"
+//                 }
+//             },
+//             {
+//                 $addFields: {
+//                     sumAmount: {
+//                         $sum: "$service.price"
+//                     }
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: {
+//                         year: { $year: "$date" },
+//                         month: { $month: "$date" }
+//                     },
+//                     sales: { $sum: "$sumAmount" }
+//                 }
+//             },
+//             {
+//                 $match: {
+//                     '_id.year': Number(year),
+//                     '_id.month': Number(month)
+//                 }
+//             }
+//         ]);
+//         if(appointments.length > 0){
+//             sales = appointments[0].sales;
+//         } 
+//         return sales;
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
