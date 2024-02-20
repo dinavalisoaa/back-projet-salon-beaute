@@ -1,6 +1,9 @@
 const Employee = require("../models/employee");
+const Appointment = require("../models/appointment");
 const Utils = require("../utils");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new employee
 exports.registration = async (req, res) => {
@@ -205,5 +208,62 @@ exports.deactivateAccount = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while updating the employee" });
+  }
+};
+
+// Montant de commission pour la journee
+exports.commissionForTheDay = async (req, res) => {
+  const employeeId = req.params.employeeId;
+  const date = req.query.date;
+  try {
+      const tasks = await Appointment.aggregate([
+          {
+              $addFields: {
+                year: { $year: "$date" },
+                month: { $month: "$date" },
+                day: { $dayOfMonth: "$date" }
+              }
+          },
+          {
+              $match: {
+                  status: 2,
+                  employee: new ObjectId(employeeId),
+                  year: Number(new Date(date).getFullYear()),
+                  month: Number(new Date(date).getMonth() + 1),
+                  day: Number(new Date(date).getDate())
+              }
+          },
+          {
+              $lookup: {
+                  from: "services", 
+                  localField: "service",
+                  foreignField: "_id",
+                  as: "service"
+              }
+          },
+          {
+              $addFields: {
+                  sumCommission: {
+                       $sum: {
+                        $map: {
+                            input: "$service",
+                            as: "s",
+                            in: { $divide: [{ $multiply: [  "$$s.price", "$$s.commission" ] }, 100] }
+                        }
+                    }
+                  }
+              }
+          },
+          {
+              $group: {
+                  _id: null,
+                  total: { $sum: "$sumCommission" }
+              }
+          }
+      ]);
+      res.json(tasks[0].total);
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "An error occurred while fetching data" });
   }
 };
