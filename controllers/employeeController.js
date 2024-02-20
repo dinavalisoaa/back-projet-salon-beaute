@@ -215,6 +215,7 @@ exports.deactivateAccount = async (req, res) => {
 exports.commissionForTheDay = async (req, res) => {
   const employeeId = req.params.employeeId;
   const date = req.query.date;
+  var total = { _id: null, total: 0 };
   try {
       const tasks = await Appointment.aggregate([
           {
@@ -261,7 +262,10 @@ exports.commissionForTheDay = async (req, res) => {
               }
           }
       ]);
-      res.json(tasks[0].total);
+      if(tasks.length > 0){
+        total = tasks[0];
+      }
+      res.json(total);
   } catch (error) {
       console.log(error);
       res.status(500).json({ error: "An error occurred while fetching data" });
