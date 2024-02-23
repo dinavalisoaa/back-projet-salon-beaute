@@ -23,6 +23,11 @@ const port = process.env.PORT || 5050;
 const swaggerUI = require("swagger-ui-express");
 const protectedRoute = require("./routes/protectedRoutes");
 
+const exphbs = require('express-handlebars').create();
+
+app.engine('handlebars', exphbs.engine);
+app.set('view engine', 'handlebars');
+
 // Serve Swagger documentation
 // Connect to MongoDB
 mongoose.connect(process.env.DATABASE_URL);
