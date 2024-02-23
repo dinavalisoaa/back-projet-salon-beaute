@@ -4,6 +4,7 @@ const Customer = require("../models/customer");
 const Service = require("../models/service");
 const Utils = require("../utils");
 const mongoose = require("mongoose");
+const { test } = require("./appointmentService");
 const ObjectId = mongoose.Types.ObjectId;
 mongoose.m;
 exports.createAppointment = async (req, res) => {
@@ -12,6 +13,7 @@ exports.createAppointment = async (req, res) => {
     const appointment = new Appointment(appointment_data);
     appointment.employee = null;
     const savedAppointment = await appointment.save();
+    // console.log(test());
     res.status(201).json(savedAppointment);
   } catch (error) {
     res.status(500).json({ error: error });
@@ -92,6 +94,24 @@ exports.getAppointment = async (req, res) => {
   const appointmentId = req.params.id;
   try {
     const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+    res.json(appointment);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the appointment" });
+  }
+};
+
+// Get a specific appointment by ID
+exports.getByEmp = async (req, res) => {
+  const emp = req.params.emp;
+  try {
+    const appointment = await Appointment.find({
+      employee: new ObjectId(emp)
+    });
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }

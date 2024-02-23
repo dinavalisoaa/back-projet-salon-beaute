@@ -14,6 +14,7 @@ const employeeData = new mongoose.Schema({
     email: String,
     profile: String,
     password: String,
+    speciality:String,
     schedule: {
         entry: Date,
         exit: Date

@@ -7,6 +7,7 @@ router.post('/appointment', appointmentController.createAppointment);
 router.get('/appointment/:id', appointmentController.getAppointment);
 router.get('/appointment/customer/:customerId', appointmentController.getCustomerAppointment);
 router.put('/appointment/:id', appointmentController.updateAppointment);
+router.get('/appointment/state/:emp', appointmentController.getByEmp);
 router.patch('/appointment/:id', appointmentController.patchAppointment);
 router.delete('/appointment/:id', appointmentController.deleteAppointment);
 router.delete('/appointment/:id/pay', appointmentController.payAppointment);
