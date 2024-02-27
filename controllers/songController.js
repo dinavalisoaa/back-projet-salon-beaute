@@ -18,7 +18,7 @@ exports.getAllSong = async (req, res) => {
    const song = await Song.find();
    res.json(song);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching song' });
+   res.status(500).json({ error: 'An error occurred while fetching data' });
  }
 };
 
