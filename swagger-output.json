@@ -972,9 +972,6 @@
                 },
                 "status": {
                   "example": "any"
-                },
-                "isPaid": {
-                  "example": "any"
                 }
               }
             }
