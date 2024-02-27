@@ -372,11 +372,16 @@ async function expensesAmount(year, month) {
                     month: Number(month)
                 }
             },
-            {
-                $project: {
-                    expenses: { $sum: "$amount" }
-                }
+            { $group: {
+                _id: null,
+                 expenses: { $sum: "$amount" }
+              }
             }
+            // {
+            //     $project: {
+            //         expenses: { $sum: "$amount" }
+            //     }
+            // }
         ]);
         if(expenses.length > 0){
             expensesValue = expenses[0].expenses;
@@ -481,13 +486,15 @@ async function totalExpensesAmount() {
     var expensesValue = 0;
     try {
         const expenses = await Expense.aggregate([
-            {
-                $project: {
-                    expenses: { $sum: "$amount" }
-                }
+            
+               { $group: {
+                    _id: null,
+                     expenses: { $sum: "$amount" }
+                  }
+                
             }
         ]);
-        if(expenses.length > 0){
+        if(expenses.length >0){
             expensesValue = expenses[0].expenses;
         }
         return expensesValue;
