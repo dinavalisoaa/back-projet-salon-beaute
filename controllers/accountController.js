@@ -64,7 +64,7 @@ exports.getAllAccount = async (req, res) => {
     res.json(song);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "An error occurred while fetching song" });
+    res.status(500).json({ error: "An error occurred while fetching data" });
   }
 };
 // Get all songs
@@ -92,7 +92,7 @@ exports.getState = async (req, res) => {
     res.json(song);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "An error occurred while fetching song" });
+    res.status(500).json({ error: "An error occurred while fetching data" });
   }
 };
 
