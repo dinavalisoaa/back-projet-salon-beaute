@@ -8,6 +8,17 @@ const Employee = require("../models/employee");
 const ObjectId = mongoose.Types.ObjectId;
 const utilController = require("./utilController");
 
+function subtractDatePart(date, hours) {
+  const newDate = new Date(date);
+  newDate.setHours(newDate.getHours() + hours);
+  // const datePart = {
+  //     day: new Date(newDate).getDate(),
+  //     month: new Date(newDate).getMonth() + 1,
+  //     hour: new Date(newDate).getHours(),
+  //     minute: new Date(newDate).getMinutes(),
+  // };
+  return new Date(new Date(newDate).getFullYear(),new Date(newDate).getMonth(),new Date(newDate).getDate(),new Date(newDate).getHours(),new Date(newDate).getMinutes());
+}
 // Create a new customer
 exports.createCustomer = async (req, res) => {
   const { name, password, email } = req.body;
@@ -113,20 +124,23 @@ exports.authentication = async (req, res) => {
     }).populate("sex");
     if (customer != null) {
       const token = jwt.sign({ userId: customer._id }, "your-secret-key", {
-        expiresIn: "15h",
+        expiresIn: "1h",
       });
+     
+
       res.setHeader("Authorization", token);
       console.log({
         token,
         userId: customer._id,
         role: "CUSTOMER",
-        info: customer,
+        info: customer,  expiration:utilController.getExpiration()
       });
       res.status(200).json({
         token,
         userId: customer._id,
         role: "CUSTOMER",
         info: customer,
+        expiration:utilController.getExpiration()
       });
     } else {
       throw new Error("Compte introuvable");
