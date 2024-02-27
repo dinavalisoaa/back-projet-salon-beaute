@@ -95,8 +95,10 @@ exports.createAppointment = async (req, res) => {
       if(new Date(Utils.jsDate(appointment_data.date)) <= new Date()){
         throw new Error("Merci de choisir une date futur");
       }
-      const savedAppointment = await appointment.save();
-      res.status(201).json(savedAppointment);
+      else{
+        const savedAppointment = await appointment.save();
+        res.status(201).json(savedAppointment);
+      }
     }
     else{
       throw new Error("L'heure que vous avez choisi n'est plus disponible");
