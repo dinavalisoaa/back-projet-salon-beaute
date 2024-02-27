@@ -98,7 +98,7 @@ exports.createAppointment = async (req, res) => {
       throw new Error("L'heure que vous avez choisi n'est plus disponible");
     }
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 };
 
