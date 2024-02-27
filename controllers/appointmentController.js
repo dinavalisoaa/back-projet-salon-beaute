@@ -1,22 +1,105 @@
 const Appointment = require("../models/appointment");
 // const Utils = require("../utils");
 const Customer = require("../models/customer");
+const Employee = require("../models/employee");
 const Service = require("../models/service");
 const Utils = require("../utils");
 const mongoose = require("mongoose");
 const { test } = require("./appointmentService");
 const ObjectId = mongoose.Types.ObjectId;
 // mongoose.m;
+// mongoose.m;
+
+// async function getAppointmentInSameDate(appointment_data) {
+//   try {
+//     const start = appointment_data.date;
+//     const end = Utils.addMinutesToDate(start, appointment_data.duration);
+//     console.log("START: " + start + " ,,, END: " + end);
+//     const appointment = await Appointment.find({
+//       date: { $gte: start, $lte: end },
+//     });
+//     return appointment.length;
+//   } catch (error) {
+//     throw new error(error);
+//   }
+// }; 
+
+async function getAppointmentInSameDate(appointment_data) {
+  try {
+    const start = appointment_data.date;
+    const end = Utils.addMinutesToDate(start, appointment_data.duration);
+    console.log("START: " + start + " ,,, END: " + end);
+    const appointment = await Appointment.aggregate([
+      {
+          $lookup: {
+              from: "services", 
+              localField: "service",
+              foreignField: "_id",
+              as: "service"
+          }
+      },
+      {
+          $addFields: {
+              sumDuration: {
+                  $sum: "$service.duration"
+              }
+          }
+      },
+      {
+        $addFields: {
+            endDate: {
+              $add: ["$date", { $multiply: ["$sumDuration", 60000] }]
+            }
+        }
+      },
+      {
+        $match: {
+          $or: [
+            { date: { $gte: new Date(start), $lte: new Date(end) } },
+            {
+              $and: [
+                { date: { $lte: new Date(start)} },
+                { endDate: { $gte: new Date(end)} },
+              ]
+            },
+            { endDate: { $gte: new Date(start), $lte: new Date(end) } }
+          ]
+        }
+      }
+    ]);
+    return appointment.length;
+  } catch (error) {
+    throw new error(error);
+  }
+}; 
+
+async function isAvailable(appointment_data) {
+  try {
+    const nbAppointment = await getAppointmentInSameDate(appointment_data);
+    const nbEmployee = (await Employee.find({ status: 1 })).length;
+    if(nbEmployee > nbAppointment){
+      return true;
+    }
+    return false;
+  } catch (error) {
+    throw new error(error);
+  }
+}; 
+
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {
     const appointment = new Appointment(appointment_data);
     appointment.employee = null;
-    const savedAppointment = await appointment.save();
-    // console.log(test());
-    res.status(201).json(savedAppointment);
+    if(await isAvailable(appointment_data)){
+      const savedAppointment = await appointment.save();
+      res.status(201).json(savedAppointment);
+    }
+    else{
+      throw new Error("L'heure que vous avez choisi n'est plus disponible");
+    }
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 };
 exports.getPref = async (req, res) => {
@@ -150,7 +233,6 @@ exports.payAppointment = async (req, res) => {
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { isPaid: true },
       { new: true }
     );
 
@@ -174,11 +256,11 @@ exports.payAppointment = async (req, res) => {
 // Update a appointment by ID
 exports.updateAppointment = async (req, res) => {
   const appointmentId = req.params.id;
-  const { date, customer, service, status, isPaid } = req.body;
+  const { date, customer, service, status } = req.body;
   try {
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { date, customer, service, status, isPaid },
+      { date, customer, service, status },
       { new: true }
     );
     if (!updatedAppointment) {

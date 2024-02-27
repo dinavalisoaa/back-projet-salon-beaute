@@ -204,11 +204,6 @@ exports.salesPerDay = async (req, res) => {
         }
         const appointments = await Appointment.aggregate([
             {
-                $match: {
-                    isPaid: true
-                }
-            },
-            {
                 $lookup: {
                     from: "services", 
                     localField: "service",
@@ -257,11 +252,6 @@ exports.averageSalesPerDay = async (req, res) => {
     try {
         const appointments = await Appointment.aggregate([
             {
-                $match: {
-                    isPaid: true
-                }
-            },
-            {
                 $lookup: {
                     from: "services", 
                     localField: "service",
@@ -305,11 +295,6 @@ async function salesAmount(year, month) {
     var sales = 0;
     try {
         const appointments = await Appointment.aggregate([
-            {
-                $match: {
-                    isPaid: true
-                }
-            },
             {
                 $lookup: {
                     from: "services", 
@@ -461,11 +446,6 @@ async function totalSalesAmount() {
     var sales = 0;
     try {
         const appointments = await Appointment.aggregate([
-            {
-                $match: {
-                    isPaid: true
-                }
-            },
             {
                 $lookup: {
                     from: "services", 
