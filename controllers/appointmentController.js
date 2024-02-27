@@ -6,7 +6,7 @@ const Utils = require("../utils");
 const mongoose = require("mongoose");
 const { test } = require("./appointmentService");
 const ObjectId = mongoose.Types.ObjectId;
-mongoose.m;
+// mongoose.m;
 exports.createAppointment = async (req, res) => {
   const appointment_data = req.body;
   try {
@@ -17,6 +17,27 @@ exports.createAppointment = async (req, res) => {
     res.status(201).json(savedAppointment);
   } catch (error) {
     res.status(500).json({ error: error });
+  }
+};
+exports.getPref = async (req, res) => {
+  console.log('.............');
+  try {
+    const appointment = await Appointment.find({'customer.preference.employee':"65c17c10b88d3133dca69c78" })
+      .populate("customer")
+      .populate("service")
+      .populate("employee").find({
+
+      })
+      .sort({})
+      .exec();
+
+    res.json(appointment);
+  } catch (error) {
+  console.log('.............'+error);
+
+  //  res
+  //     .status(500) 
+  //     .json({error });
   }
 };
 
