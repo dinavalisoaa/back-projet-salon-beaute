@@ -18,8 +18,15 @@ function convertMinutesToHoursAndMinutes(totalMinutes) {
     return {hours, minutes};
 }
 
+function addMinutesToDate(date, minutes) {
+    const newDate = new Date(date);
+    newDate.setMinutes(newDate.getMinutes() + minutes);
+    return newDate;
+}
+
 module.exports = {
     encryptPassword,
     isValidEmail,
-    convertMinutesToHoursAndMinutes
+    convertMinutesToHoursAndMinutes,
+    addMinutesToDate
 };
