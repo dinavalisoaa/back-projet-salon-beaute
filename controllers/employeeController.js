@@ -4,6 +4,7 @@ const Utils = require("../utils");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const utilController = require("./utilController");
 
 // Create a new employee
 exports.registration = async (req, res) => {
@@ -98,14 +99,25 @@ exports.authentication = async (req, res) => {
 
     if (customer != null) {
       const token = jwt.sign({ userId: customer._id }, "your-secret-key", {
-        expiresIn: "15h",
+        expiresIn: "1h",
       });
 
       res.setHeader("Authorization", token);
-      console.log(token.exp);
+      console.log({
+        token,
+        userId: customer._id,
+        role: "EMP",
+        info: customer,
+        expiration:utilController.getExpiration()});
       res
         .status(200)
-        .json({ token, userId: customer._id, role: "EMP", info: customer });
+        .json({
+          token,
+          userId: customer._id,
+          role: "EMP",
+          info: customer,
+          expiration:utilController.getExpiration()
+        });
     } else {
       throw new Error("Compte introuvable");
     }
@@ -126,8 +138,11 @@ exports.updateEmployee = async (req, res) => {
     employee.schedule.exit = new Date(
       "1970-01-01T" + employee.schedule.exit + ":00Z"
     );
-    if(employee.schedule.entry==undefined || employee.schedule.exit==undefined){
-        throw new Error("Remplir");
+    if (
+      employee.schedule.entry == undefined ||
+      employee.schedule.exit == undefined
+    ) {
+      throw new Error("Remplir");
     }
 
     if (
@@ -217,57 +232,62 @@ exports.commissionForTheDay = async (req, res) => {
   const date = req.query.date;
   var total = { _id: null, total: 0 };
   try {
-      const tasks = await Appointment.aggregate([
-          {
-              $addFields: {
-                year: { $year: "$date" },
-                month: { $month: "$date" },
-                day: { $dayOfMonth: "$date" }
-              }
+    const tasks = await Appointment.aggregate([
+      {
+        $addFields: {
+          year: { $year: "$date" },
+          month: { $month: "$date" },
+          day: { $dayOfMonth: "$date" },
+        },
+      },
+      {
+        $match: {
+          status: 2,
+          employee: new ObjectId(employeeId),
+          year: Number(new Date(date).getFullYear()),
+          month: Number(new Date(date).getMonth() + 1),
+          day: Number(new Date(date).getDate()),
+        },
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "service",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      {
+        $addFields: {
+          sumCommission: {
+            $sum: {
+              $map: {
+                input: "$service",
+                as: "s",
+                in: {
+                  $divide: [
+                    { $multiply: ["$$s.price", "$$s.commission"] },
+                    100,
+                  ],
+                },
+              },
+            },
           },
-          {
-              $match: {
-                  status: 2,
-                  employee: new ObjectId(employeeId),
-                  year: Number(new Date(date).getFullYear()),
-                  month: Number(new Date(date).getMonth() + 1),
-                  day: Number(new Date(date).getDate())
-              }
-          },
-          {
-              $lookup: {
-                  from: "services", 
-                  localField: "service",
-                  foreignField: "_id",
-                  as: "service"
-              }
-          },
-          {
-              $addFields: {
-                  sumCommission: {
-                       $sum: {
-                        $map: {
-                            input: "$service",
-                            as: "s",
-                            in: { $divide: [{ $multiply: [  "$$s.price", "$$s.commission" ] }, 100] }
-                        }
-                    }
-                  }
-              }
-          },
-          {
-              $group: {
-                  _id: null,
-                  total: { $sum: "$sumCommission" }
-              }
-          }
-      ]);
-      if(tasks.length > 0){
-        total = tasks[0];
-      }
-      res.json(total);
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$sumCommission" },
+        },
+      },
+    ]);
+    if (tasks.length > 0) {
+      total = tasks[0];
+    }
+    res.json(total);
   } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "An error occurred while fetching data" });
+    console.log(error);
+    res.status(500).json({ error: "An error occurred while fetching data" });
   }
 };
