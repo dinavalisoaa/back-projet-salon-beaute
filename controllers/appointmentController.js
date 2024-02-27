@@ -92,6 +92,9 @@ exports.createAppointment = async (req, res) => {
     const appointment = new Appointment(appointment_data);
     appointment.employee = null;
     if(await isAvailable(appointment_data)){
+      if(new Date(Utils.jsDate(appointment_data.date)) <= new Date()){
+        throw new Error("Merci de choisir une date futur");
+      }
       const savedAppointment = await appointment.save();
       res.status(201).json(savedAppointment);
     }
@@ -102,6 +105,7 @@ exports.createAppointment = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 exports.getPref = async (req, res) => {
   console.log('.............');
   try {
