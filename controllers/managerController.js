@@ -1,5 +1,6 @@
 const Manager = require("../models/manager");
 const Utils = require("../utils");
+const utilController = require("./utilController");
 
 const jwt = require("jsonwebtoken");
 // Create a new manager
@@ -39,11 +40,11 @@ exports.authentication = async (req, res) => {
     });
     if (manager != null) {
       const token = jwt.sign({ userId: manager._id }, "your-secret-key", {
-        expiresIn: "15h",
+        expiresIn: "1h",
       });
       res.setHeader("Authorization", token);
-      console.log(token);
-      res.status(200).json({ token, userId: manager._id, role: "MANAGER" });
+      console.log({ token, userId: manager._id, role: "MANAGER",expiration:utilController.getExpiration() });
+      res.status(200).json({ token, userId: manager._id, role: "MANAGER",expiration:utilController.getExpiration() });
     } else {
       res.status(401).json({ error: "Compte introuvable" });
     }
