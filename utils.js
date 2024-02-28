@@ -24,9 +24,20 @@ function addMinutesToDate(date, minutes) {
     return newDate;
 }
 
+function subtractDate(date, hours) {
+    const newDate = new Date(date);
+    newDate.setHours(newDate.getHours() - hours);
+    return newDate;
+}
+
+function jsDate(date) {
+    return subtractDate(date, 3);
+}
+
 module.exports = {
     encryptPassword,
     isValidEmail,
     convertMinutesToHoursAndMinutes,
-    addMinutesToDate
+    addMinutesToDate,
+    jsDate
 };

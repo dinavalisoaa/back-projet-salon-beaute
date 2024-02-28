@@ -8,7 +8,7 @@ exports.createSong = async (req, res) => {
    const savedSong = await song.save();
    res.status(201).json(savedSong);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while creating the song' });
+   res.status(500).json({ error: 'An error occurred while creating the object' });
  }
 };
 
@@ -18,7 +18,7 @@ exports.getAllSong = async (req, res) => {
    const song = await Song.find();
    res.json(song);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching song' });
+   res.status(500).json({ error: 'An error occurred while fetching data' });
  }
 };
 
@@ -32,7 +32,7 @@ exports.getSong = async (req, res) => {
        }
        res.json(song);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while fetching the song' });
+   res.status(500).json({ error: 'An error occurred while fetching the object' });
  }
 };
 
@@ -48,7 +48,7 @@ exports.updateSong = async (req, res) => {
    }
    res.json(updatedSong);
  } catch (error) {
-   res.status(500).json({ error: 'An error occurred while updating the song' });
+   res.status(500).json({ error: 'An error occurred while updating the object' });
  }
 };
 
@@ -64,6 +64,6 @@ exports.deleteSong = async (req, res) => {
    res.json(deletedSong);
  } catch (error) {
     console.log(error);
-   res.status(500).json({ error: 'An error occurred while deleting the song' });
+   res.status(500).json({ error: 'An error occurred while deleting the object' });
  }
 };
